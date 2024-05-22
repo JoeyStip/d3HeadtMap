@@ -17,9 +17,9 @@
                     console.log(json, arr)
 
                     const margin = {
-                        top: 90, 
+                        top: 50, 
                         right: 50, 
-                        bottom: 0, 
+                        bottom: 30, 
                         left: 60
                     }
                     const w = 900 - margin.left - margin.right;
@@ -44,7 +44,7 @@
                         .enter()
                         .append("rect")
                         .attr("x", (d)=>xScale(d.year))
-                        .attr("y", (d)=>yScale(d.month))
+                        .attr("y", (d)=>yScale(d.month)-rectH)
                         .attr("width", rectW)
                         .attr("height", rectH)
                         .style("fill", "red")
@@ -53,7 +53,7 @@
                         const yAxisGenerator = d3.axisLeft(yScale);
         
                         const xAxis = svg.append("g")
-                            .attr("transform", "translate(0," + (h-margin.bottom) + ")")
+                            .attr("transform", "translate(0," + (margin.top + h) + ")")
                             .attr("id", "x-axis")
                             .call(xAxisGenerator);
                         const yAxis = svg.append("g")
