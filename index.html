@@ -13,27 +13,54 @@
                 .then(response => response.json())
                 .then(data => {
                     const json = data;
-                    console.log(json, json.monthlyVariance)
+                    const arr = json.monthlyVariance
+                    console.log(json, arr)
 
-                    const w = 800;
-                    const h = 500;
+                    const margin = {
+                        top: 90, 
+                        right: 0, 
+                        bottom: 0, 
+                        left: 60
+                    }
+                    const w = 900 - margin.left - margin.right;
+                    const h = 500 - margin.top - margin.bottom;
+                    const rectH = h/12;
+                    const rectW = w/(arr.length/12);
 
                     const xScale = d3.scaleLinear()
-                        .domain([d3.min(json.monthlyVariance, (d)=>d.year), d3.max(json.monthlyVariance, (d)=>d.year)])
-
+                        .domain([d3.min(arr, (d)=>d.year), d3.max(arr, (d)=>d.year)])
+                        .range([margin.left, (margin.left+w)]);
+                    const yScale = d3.scaleLinear()
+                        .domain([d3.min(arr, (d)=>d.month), d3.max(arr, (d)=>d.month)])
+                        .range([margin.top + h, margin.top])
                     const svg = d3.select("body")
                         .append("svg")
-                        .attr("width", w)
-                        .attr("height", h)
+                        .attr("width", w+margin.left+margin.right)
+                        .attr("height", h+margin.top+margin.bottom)
                         .attr("x", 25)
                         .attr("y", 35);
-                    
                     svg.selectAll("rect")
-                        .data(json)
+                        .data(arr)
                         .enter()
                         .append("rect")
-
+                        .attr("x", (d)=>xScale(d.year))
+                        .attr("y", (d)=>yScale(d.month))
+                        .attr("width", rectW)
+                        .attr("height", rectH)
+                        .style("fill", "red")
                 });
+
+                const xAxisGenerator = d3.axisBottom(xScale);
+                const yAxisGenerator = d3.axisLeft(yScale);
+
+                const xAxis = svg.append("g")
+                    .attr("transform", "translate(0," + (h-margin.bottom) + ")")
+                    .attr("id", "x-axis")
+                    .call(xAxisGenerator);
+                const yAxis = svg.append("g")
+                    .attr("transform", "translate(" + margin.left + ",0)")
+                    .attr("id", "y-axis")
+                    .call(yAxisGenerator);
         </script>
         <script src="https://cdn.freecodecamp.org/testable-projects-fcc/v1/bundle.js"></script>
     </body>
