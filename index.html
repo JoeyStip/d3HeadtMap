@@ -18,7 +18,7 @@
 
                     const margin = {
                         top: 90, 
-                        right: 0, 
+                        right: 50, 
                         bottom: 0, 
                         left: 60
                     }
@@ -48,19 +48,20 @@
                         .attr("width", rectW)
                         .attr("height", rectH)
                         .style("fill", "red")
+
+                        const xAxisGenerator = d3.axisBottom(xScale);
+                        const yAxisGenerator = d3.axisLeft(yScale);
+        
+                        const xAxis = svg.append("g")
+                            .attr("transform", "translate(0," + (h-margin.bottom) + ")")
+                            .attr("id", "x-axis")
+                            .call(xAxisGenerator);
+                        const yAxis = svg.append("g")
+                            .attr("transform", "translate(" + margin.left + ",0)")
+                            .attr("id", "y-axis")
+                            .call(yAxisGenerator);
                 });
 
-                const xAxisGenerator = d3.axisBottom(xScale);
-                const yAxisGenerator = d3.axisLeft(yScale);
-
-                const xAxis = svg.append("g")
-                    .attr("transform", "translate(0," + (h-margin.bottom) + ")")
-                    .attr("id", "x-axis")
-                    .call(xAxisGenerator);
-                const yAxis = svg.append("g")
-                    .attr("transform", "translate(" + margin.left + ",0)")
-                    .attr("id", "y-axis")
-                    .call(yAxisGenerator);
         </script>
         <script src="https://cdn.freecodecamp.org/testable-projects-fcc/v1/bundle.js"></script>
     </body>
