@@ -6,8 +6,34 @@
         <link href="index.css" rel="stylesheet">
     </head>
     <body>
-        <script>
+        <script type="module">
+            import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
 
+            fetch("https://raw.githubusercontent.com/freeCodeCamp/ProjectReferenceData/master/global-temperature.json")
+                .then(response => response.json())
+                .then(data => {
+                    const json = data;
+                    console.log(json, json.monthlyVariance)
+
+                    const w = 800;
+                    const h = 500;
+
+                    const xScale = d3.scaleLinear()
+                        .domain([d3.min(json.monthlyVariance, (d)=>d.year), d3.max(json.monthlyVariance, (d)=>d.year)])
+
+                    const svg = d3.select("body")
+                        .append("svg")
+                        .attr("width", w)
+                        .attr("height", h)
+                        .attr("x", 25)
+                        .attr("y", 35);
+                    
+                    svg.selectAll("rect")
+                        .data(json)
+                        .enter()
+                        .append("rect")
+
+                });
         </script>
         <script src="https://cdn.freecodecamp.org/testable-projects-fcc/v1/bundle.js"></script>
     </body>
