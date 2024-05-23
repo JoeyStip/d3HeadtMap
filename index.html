@@ -6,6 +6,7 @@
         <link href="index.css" rel="stylesheet">
     </head>
     <body>
+        <div id="tooltip"></div>
         <script type="module">
             import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
 
@@ -48,6 +49,23 @@
                         .attr("width", rectW)
                         .attr("height", rectH)
                         .style("fill", "red")
+                        .on("mouseover", (event, d)=>{
+                            const [x, y] = [event.pageX, event.pageY]
+                            // const []
+
+                            d3.select("#tooltip")
+                                .style("opacity", 0.9)
+                                .style("transform", `translate(${x}px, ${y}px)`)
+                                .html(
+                                    "year: " + d.year + "<br/>" + 
+                                    "month: " + d.month + "<br/>" + 
+                                    "variance: " + d.variance + "<br/>"
+                                )
+                        })
+                        .on("mouseout", (event, d)=>{
+                            d3.select("#tooltip")
+                                .style("opacity", 0);
+                        })
 
                         const xAxisGenerator = d3.axisBottom(xScale);
                         const yAxisGenerator = d3.axisLeft(yScale);

@@ -1,1 +1,14 @@
-/*# sourceMappingURL=index.css.map */
+body {
+  background-color: beige;
+}
+
+#tooltip {
+  background-color: white;
+  height: auto;
+  width: auto;
+  opacity: 0;
+  position: absolute;
+  pointer-events: none;
+  border-radius: 15px;
+  padding: 10px;
+}/*# sourceMappingURL=index.css.map */
