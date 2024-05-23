@@ -67,17 +67,19 @@
                                 .style("opacity", 0);
                         })
 
-                        const xAxisGenerator = d3.axisBottom(xScale);
+                        const xAxisGenerator = d3.axisBottom(xScale).tickFormat(d3.format(".0f"));
                         const yAxisGenerator = d3.axisLeft(yScale);
         
                         const xAxis = svg.append("g")
                             .attr("transform", "translate(0," + (margin.top + h) + ")")
                             .attr("id", "x-axis")
-                            .call(xAxisGenerator);
+                            .call(xAxisGenerator)
                         const yAxis = svg.append("g")
                             .attr("transform", "translate(" + margin.left + ",0)")
                             .attr("id", "y-axis")
                             .call(yAxisGenerator);
+
+                       
                 });
 
         </script>
