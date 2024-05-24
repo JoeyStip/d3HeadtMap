@@ -10,6 +10,8 @@
         <script type="module">
             import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
 
+            const legendColors = ['#d53e4f','#f46d43','#fdae61','#fee08b','#ffffbf','#e6f598','#abdda4','#66c2a5','#3288bd']
+
             fetch("https://raw.githubusercontent.com/freeCodeCamp/ProjectReferenceData/master/global-temperature.json")
                 .then(response => response.json())
                 .then(data => {
@@ -20,27 +22,33 @@
                     const margin = {
                         top: 50, 
                         right: 50, 
-                        bottom: 30, 
+                        bottom: 110, 
                         left: 60
                     }
                     const w = 900 - margin.left - margin.right;
-                    const h = 500 - margin.top - margin.bottom;
+                    const h = 600 - margin.top - margin.bottom;
                     const rectH = h/12;
                     const rectW = w/(arr.length/12);
 
-                    const xScale = d3.scaleLinear()
+                    const xScale = d3
+                        .scaleLinear()
                         .domain([d3.min(arr, (d)=>d.year), d3.max(arr, (d)=>d.year)])
                         .range([margin.left, (margin.left+w)]);
-                    const yScale = d3.scaleLinear()
+                    const yScale = d3
+                        .scaleLinear()
                         .domain([d3.min(arr, (d)=>d.month), d3.max(arr, (d)=>d.month)])
                         .range([margin.top + h, margin.top])
-                    const svg = d3.select("body")
+                    const svg = d3
+                        .select("body")
                         .append("svg")
                         .attr("width", w+margin.left+margin.right)
                         .attr("height", h+margin.top+margin.bottom)
                         .attr("x", 25)
                         .attr("y", 35);
-                    svg.selectAll("rect")
+                    svg
+                        .append("g")
+                        .attr("id", "rectangles")
+                        .selectAll("rect")
                         .data(arr)
                         .enter()
                         .append("rect")
@@ -67,19 +75,90 @@
                                 .style("opacity", 0);
                         })
 
-                        const xAxisGenerator = d3.axisBottom(xScale).tickFormat(d3.format(".0f"));
-                        const yAxisGenerator = d3.axisLeft(yScale);
-        
-                        const xAxis = svg.append("g")
-                            .attr("transform", "translate(0," + (margin.top + h) + ")")
-                            .attr("id", "x-axis")
-                            .call(xAxisGenerator)
-                        const yAxis = svg.append("g")
-                            .attr("transform", "translate(" + margin.left + ",0)")
-                            .attr("id", "y-axis")
-                            .call(yAxisGenerator);
+                    const xAxisGenerator = d3.axisBottom(xScale).tickFormat(d3.format(".0f"));
+                    const yAxisGenerator = d3.axisLeft(yScale);
+    
+                    const xAxis = svg
+                        .append("g")
+                        .attr("transform", "translate(0," + (margin.top + h) + ")")
+                        .attr("id", "x-axis")
+                        .call(xAxisGenerator)
+                    const yAxis = svg
+                        .append("g")
+                        .attr("transform", "translate(" + margin.left + ",0)")
+                        .attr("id", "y-axis")
+                        .call(yAxisGenerator);
 
-                       
+                    const legendWidth = 400;
+                    const legendHeight = 50;
+                    
+                    const variance = arr.map((d)=>d.variance);
+                    const minTemp = json.baseTemperature + Math.min(...variance);
+                    const maxTemp = json.baseTemperature + Math.max(...variance);
+
+                    const legendThreshold = d3
+                        .scaleThreshold()
+                        .domain(((min, max, count)=>{
+                            let array = [];
+                            let step = (max - min)/count;
+                            let base = min;
+                            for (let i = 1; i < count; i++){
+                                array.push(base + i * step);
+                            }
+                            return array;
+                            })(minTemp, maxTemp, legendColors.length)
+                        )
+                        .range(legendColors)
+                    
+                    const legendX = d3
+                        .scaleLinear()
+                        .domain([minTemp, maxTemp])
+                        .range([0, legendWidth]);
+
+                    const legendAxis = d3
+                        .axisBottom()
+                        .scale(legendX)
+                        .tickSize(10, 0)
+                        .tickValues(legendThreshold.domain())
+                        .tickFormat(d3.format('.1f'));
+
+                    const legend = svg
+                        .append('g')
+                        .classed("legend", true)
+                        .attr("id", "legend")
+                        .attr("transform", "translate(" + margin.left + "," + (margin.top + h + margin.bottom - 2 * legendHeight) + ")");
+                    
+                    const squares = legend 
+                        .append("g")
+                        .selectAll("rect")
+                        .data(
+                            legendThreshold.range().map((color)=>{
+                                let d = legendThreshold.invertExtent(color);
+                                if(d[0]===null){
+                                    d[0]=legendX.domain()[0];
+                                }
+                                if(d[1]===null){
+                                    d[1]=legendX.domain()[1]
+                                }
+                                return d
+                            })
+                        )
+                        .enter()
+                        .append("rect")
+                        .style("fill", (d)=>{
+                            legendThreshold(d[0]);
+                        })
+                        .attr("x", (d)=>legendX(d[0]))
+                        .attr("y", 0)
+                        .attr("width", (d)=>{
+                            d[0] && d[1] ? legendX(d[1])-legendX(d[0]) : legendX(null)
+                        })
+                        .attr("height", legendHeight);
+
+                    legend
+                        .append("g")
+                        .attr("transform", "translate(0," + legendHeight + ")")
+                        .call(legendAxis);
                 });
 
         </script>
