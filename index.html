@@ -90,7 +90,7 @@
                         .call(yAxisGenerator);
 
                     const legendWidth = 400;
-                    const legendHeight = 50;
+                    const legendHeight = 40;
                     
                     const variance = arr.map((d)=>d.variance);
                     const minTemp = json.baseTemperature + Math.min(...variance);
@@ -146,12 +146,12 @@
                         .enter()
                         .append("rect")
                         .style("fill", (d)=>{
-                            legendThreshold(d[0]);
+                            return legendThreshold(d[0]);
                         })
                         .attr("x", (d)=>legendX(d[0]))
                         .attr("y", 0)
                         .attr("width", (d)=>{
-                            d[0] && d[1] ? legendX(d[1])-legendX(d[0]) : legendX(null)
+                            return d[0] && d[1] ? legendX(d[1])-legendX(d[0]) : legendX(null)
                         })
                         .attr("height", legendHeight);
 
