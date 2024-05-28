@@ -20,13 +20,13 @@
                     console.log(json, arr)
 
                     const margin = {
-                        top: 50, 
+                        top: 120, 
                         right: 50, 
                         bottom: 110, 
                         left: 60
                     }
                     const w = 1200 - margin.left - margin.right;
-                    const h = 600 - margin.top - margin.bottom;
+                    const h = 700 - margin.top - margin.bottom;
                     const rectH = h/12;
                     const rectW = w/(arr.length/12);
 
@@ -38,18 +38,37 @@
                         .scaleLinear()
                         .domain([d3.min(arr, (d)=>d.month), d3.max(arr, (d)=>d.month)])
                         .range([margin.top + h, margin.top])
-                    const svg = d3
+                    
+                    const graphContainer = d3
                         .select("body")
+                        .append("div")
+                        .attr("id", "graphContainer")
+
+                    const infoContainer = d3
+                        .select("#graphContainer")
+                        .append("div")
+                        .attr("id","infoContainer")
+
+                    const title = d3
+                        .select("#infoContainer")
+                        .append("h1")
+                        .text("Global Average Temperatures")
+
+                    const subTitle = d3
+                        .select("infoContainer")
+                    
+                    const svg = d3
+                        .select("#graphContainer")
                         .append("svg")
                         .attr("width", w+margin.left+margin.right)
                         .attr("height", h+margin.top+margin.bottom)
                         .attr("x", 25)
                         .attr("y", 35);
+
+                    const xAxisGenerator = d3.axisBottom(xScale).tickFormat(d3.format(".0f"));
+                    const yAxisGenerator = d3.axisLeft(yScale);
                         
-                        const xAxisGenerator = d3.axisBottom(xScale).tickFormat(d3.format(".0f"));
-                        const yAxisGenerator = d3.axisLeft(yScale);
-                        
-                        const xAxis = svg
+                    const xAxis = svg
                         .append("g")
                         .attr("transform", "translate(0," + (margin.top + h) + ")")
                         .attr("id", "x-axis")

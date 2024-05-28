@@ -11,4 +11,9 @@ body {
   pointer-events: none;
   border-radius: 15px;
   padding: 10px;
+}
+
+#title {
+  margin: 0 auto;
+  display: block;
 }/*# sourceMappingURL=index.css.map */
