@@ -13,7 +13,6 @@ body {
   padding: 10px;
 }
 
-#title {
-  margin: 0 auto;
-  display: block;
+#graphContainer {
+  text-align: center;
 }/*# sourceMappingURL=index.css.map */

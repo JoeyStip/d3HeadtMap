@@ -36,8 +36,8 @@
                         .range([margin.left, (margin.left+w)]);
                     const yScale = d3
                         .scaleLinear()
-                        .domain([d3.min(arr, (d)=>d.month), d3.max(arr, (d)=>d.month)])
-                        .range([margin.top + h, margin.top])
+                        .domain([d3.min(arr, (d)=>new Date(2024, d.month-1)), d3.max(arr, (d)=>new Date(2024, d.month-1))])
+                        .range([margin.top + h, margin.top]);
                     
                     const graphContainer = d3
                         .select("body")
@@ -52,10 +52,14 @@
                     const title = d3
                         .select("#infoContainer")
                         .append("h1")
+                        .attr("id", "title")
                         .text("Global Average Temperatures")
 
-                    const subTitle = d3
-                        .select("infoContainer")
+                    const Description = d3
+                        .select("#infoContainer")
+                        .append("h2")
+                        .text("some data I found")
+                        .attr("id", "description")
                     
                     const svg = d3
                         .select("#graphContainer")
@@ -66,7 +70,7 @@
                         .attr("y", 35);
 
                     const xAxisGenerator = d3.axisBottom(xScale).tickFormat(d3.format(".0f"));
-                    const yAxisGenerator = d3.axisLeft(yScale);
+                    const yAxisGenerator = d3.axisLeft(yScale).tickFormat(d3.timeFormat("%B"));
                         
                     const xAxis = svg
                         .append("g")
@@ -75,7 +79,7 @@
                         .call(xAxisGenerator)
                     const yAxis = svg
                         .append("g")
-                        .attr("transform", "translate(" + margin.left + ",0)")
+                        .attr("transform", "translate(" + (margin.left - 1) + ",0)")
                         .attr("id", "y-axis")
                         .call(yAxisGenerator);
 
@@ -150,7 +154,7 @@
                         .attr("transform", "translate(0," + legendHeight + ")")
                         .call(legendAxis);
                     
-                    svg
+                    const rectangles = svg
                         .append("g")
                         .attr("id", "rectangles")
                         .selectAll("rect")
@@ -158,19 +162,25 @@
                         .enter()
                         .append("rect")
                         .attr("x", (d)=>xScale(d.year))
-                        .attr("y", (d)=>yScale(d.month)-rectH)
+                        .attr("y", (d)=>yScale(new Date(2024, d.month-1))-rectH)
                         .attr("width", rectW)
                         .attr("height", rectH)
+                        .attr("class", "cell")
+                        .attr("data-month", (d)=>d.month-1)
+                        .attr("data-year", (d)=>d.year)
+                        .attr("data-temp", (d)=>json.baseTemperature + d.variance)
                         .style("fill", (d)=>legendThreshold(d.variance + json.baseTemperature))
                         .on("mouseover", (event, d)=>{
                             const [x, y] = [event.pageX, event.pageY]
-                
+                            const Thisdate = new Date(2024, d.month-1).toString()
+                            const month = Thisdate.substring(4,7)
+
                             d3.select("#tooltip")
                                 .style("opacity", 0.9)
                                 .style("transform", `translate(${x}px, ${y}px)`)
                                 .html(
                                     "year: " + d.year + "<br/>" + 
-                                    "month: " + d.month + "<br/>" + 
+                                    "month: " + month + "<br/>" + 
                                     "variance: " + d.variance + "<br/>"
                                 )
                         })
