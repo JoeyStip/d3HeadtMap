@@ -10,7 +10,7 @@ The d3HeatMap is a single-page web app created as part of the curriculum for the
 
 ## Usage
 
-Check out out the d3HeatMap by following this [link]().
+Check out out the d3HeatMap by following this [link](https://joeystip.github.io/d3HeatMap/).
 
 ## credits
 
