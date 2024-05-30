@@ -38,6 +38,7 @@
                         .scaleBand()
                         .domain([0,1,2,3,4,5,6,7,8,9,10,11])
                         .range([margin.top + h, margin.top])
+                        
                         //.domain([d3.min(arr, (d)=>new Date(2024, d.month-1)), d3.max(arr, (d)=>new Date(2024, d.month-1))])
                     
                     const graphContainer = d3
@@ -76,6 +77,12 @@
                     const yAxisGenerator = d3
                         .axisLeft(yScale)
                         .ticks(12, "%B") 
+                        .tickFormat((month)=>{
+                            let date = new Date(0);
+                            date.setUTCMonth(month);
+                            let format = d3.utcFormat("%B");
+                            return format(date);
+                        })
                                             
                     const xAxis = svg
                         .append("g")
@@ -183,6 +190,7 @@
                             d3.select("#tooltip")
                                 .style("opacity", 0.9)
                                 .style("transform", `translate(${x}px, ${y}px)`)
+                                .attr("data-year", d.year)
                                 .html(
                                     "year: " + d.year + "<br/>" + 
                                     "month: " + month + "<br/>" + 
