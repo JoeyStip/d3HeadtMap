@@ -10,21 +10,19 @@
         <script type="module">
             import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
 
-            const legendColors = ['#3288bd','#66c2a5','#abdda4','#e6f598','#ffffbf','#fee08b','#fdae61','#f46d43','#d53e4f']
+            const legendColors = ['#3288bd','#66c2a5','#abdda4','#e6f598','#ffffbf','#fee08b','#fdae61','#f46d43','#d53e4f'];
 
             fetch("https://raw.githubusercontent.com/freeCodeCamp/ProjectReferenceData/master/global-temperature.json")
                 .then(response => response.json())
                 .then(data => {
                     const json = data;
-                    const arr = json.monthlyVariance
-                    console.log(json, arr)
-
+                    const arr = json.monthlyVariance;
                     const margin = {
-                        top: 100, 
+                        top: 30, 
                         right: 50, 
-                        bottom: 110, 
-                        left: 60
-                    }
+                        bottom: 140, 
+                        left: 100
+                    };
                     const w = 1200 - margin.left - margin.right;
                     const h = 700 - margin.top - margin.bottom;
                     const rectH = h/12;
@@ -34,34 +32,42 @@
                         .scaleLinear()
                         .domain([d3.min(arr, (d)=>d.year), d3.max(arr, (d)=>d.year)])
                         .range([margin.left, (margin.left+w)]);
+                    
                     const yScale = d3
                         .scaleBand()
                         .domain([0,1,2,3,4,5,6,7,8,9,10,11])
-                        .range([margin.top + h, margin.top])
-                        
-                        //.domain([d3.min(arr, (d)=>new Date(2024, d.month-1)), d3.max(arr, (d)=>new Date(2024, d.month-1))])
-                    
+                        .range([margin.top + h, margin.top]);
+                         
                     const graphContainer = d3
                         .select("body")
                         .append("div")
-                        .attr("id", "graphContainer")
+                        .attr("id", "graphContainer");
 
                     const infoContainer = d3
                         .select("#graphContainer")
                         .append("div")
-                        .attr("id","infoContainer")
+                        .attr("id","infoContainer");
 
                     const title = d3
                         .select("#infoContainer")
                         .append("h1")
                         .attr("id", "title")
-                        .text("Global Average Temperatures")
+                        .text("Monthly Global Land-Surface Temperature");
 
                     const Description = d3
                         .select("#infoContainer")
+                        .append("div")
+                        .attr("id", "description");
+
+                    const desc1stLine = d3
+                        .select("#description")
                         .append("h2")
-                        .text("some data I found")
-                        .attr("id", "description")
+                        .text("From Years Spanning 1753-2015");
+
+                    const desc2ndLine = d3
+                        .select("#description")
+                        .append("h3")
+                        .html("Base Temperature of 8.66&#8451;");
                     
                     const svg = d3
                         .select("#graphContainer")
@@ -74,6 +80,7 @@
                     const xAxisGenerator = d3
                         .axisBottom(xScale)
                         .tickFormat(d3.format(".0f"));
+
                     const yAxisGenerator = d3
                         .axisLeft(yScale)
                         .ticks(12, "%B") 
@@ -82,18 +89,29 @@
                             date.setUTCMonth(month);
                             let format = d3.utcFormat("%B");
                             return format(date);
-                        })
+                        });
                                             
                     const xAxis = svg
                         .append("g")
                         .attr("transform", "translate(0," + (margin.top + h) + ")")
                         .attr("id", "x-axis")
                         .call(xAxisGenerator)
+                        .append("text")
+                        .text("Years")
+                        .attr("transform", "translate(" + (margin.left+(w/2)) +", 35)")
+                        .attr("fill", "black")
+                        .attr("font-size", 15);
+                    
                     const yAxis = svg
                         .append("g")
                         .attr("transform", "translate(" + (margin.left - 1) + ",0)")
                         .attr("id", "y-axis")
-                        .call(yAxisGenerator);
+                        .call(yAxisGenerator)
+                        .append("text")
+                        .attr("fill", "black")
+                        .attr("transform", "translate(-60," + h/2 + ") rotate(-90)")
+                        .text("Months")
+                        .attr("font-size", 15);
 
                     const legendWidth = 400;
                     const legendHeight = 40;
@@ -114,7 +132,7 @@
                             return array;
                         })(minTemp, maxTemp, legendColors.length)
                         )
-                        .range(legendColors)
+                        .range(legendColors);
                     
                     const legendX = d3
                         .scaleLinear()
@@ -132,8 +150,8 @@
                         .append('g')
                         .classed("legend", true)
                         .attr("id", "legend")
-                        .attr("transform", "translate(" + margin.left + "," + (margin.top + h + margin.bottom - 2 * legendHeight) + ")");
-                    
+                        .attr("transform", "translate(" + margin.left + "," + (margin.top + h + margin.bottom - 2 * legendHeight-18) + ")");
+
                     const squares = legend 
                         .append("g")
                         .selectAll("rect")
@@ -165,6 +183,13 @@
                         .append("g")
                         .attr("transform", "translate(0," + legendHeight + ")")
                         .call(legendAxis);
+
+                    const legendLabel = legend
+                        .append("text")
+                        .html("Temp in &#8451;")
+                        .attr("fill", "black")
+                        .attr("font-size", 15)
+                        .attr("transform", "translate(" + ((legendWidth/2)-(69.19/2)) + ",77)");
                     
                     const rectangles = svg
                         .append("g")
@@ -186,6 +211,7 @@
                             const [x, y] = [event.pageX, event.pageY]
                             const Thisdate = new Date(2024, d.month-1).toString()
                             const month = Thisdate.substring(4,7)
+                            const temp = (Math.round(100*(d.variance + json.baseTemperature)))/100
 
                             d3.select("#tooltip")
                                 .style("opacity", 0.9)
@@ -194,13 +220,14 @@
                                 .html(
                                     "year: " + d.year + "<br/>" + 
                                     "month: " + month + "<br/>" + 
-                                    "variance: " + d.variance + "<br/>"
+                                    "temp: " + temp + "&#8451;<br/>" +
+                                    "variance: " + d.variance + "&#8451;<br/>"
                                 )
                         })
                         .on("mouseout", (event, d)=>{
                             d3.select("#tooltip")
                                 .style("opacity", 0);
-                        })
+                        });
                     });
 
         </script>
